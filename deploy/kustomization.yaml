@@ -1,0 +1,23 @@
+namespace: docukube-suite
+resources:
+  - "namespace.yaml"
+  - "rke2"
+
+
+
+
+# Add a label to all resources 
+commonLabels:
+  app.kubernetes.io/name: DocuKube
+  app.kubernetes.io/version: 0.0.1
+  app.kubernetes.io/part-of: DocuKube-Suite
+
+
+# patch replica count to 3
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
