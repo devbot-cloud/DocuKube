@@ -2,8 +2,14 @@ namespace: docukube-suite
 resources:
   - "namespace.yaml"
   - "rke2"
-
-
+  - "minikube"
+  - "kubernetes"
+  - "kubebuilder"
+  - "kind"
+  - "ingress-nginx"
+  - "helm"
+  - "fluxcd"
+  - "cluster-api"
 
 
 # Add a label to all resources 
@@ -20,4 +26,4 @@ patches:
     patch: |-
       - op: replace
         path: /spec/replicas
-        value: 3
+        value: 1
