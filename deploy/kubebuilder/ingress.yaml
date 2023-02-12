@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docukube-kubebuilder-ingress
+spec:
+  rules:
+    - host: kubebuilder.docs.lootbot.cloud
+      http:
+        paths:
+          - backend:
+              service:
+                name: docukube-kubebuilder-http
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

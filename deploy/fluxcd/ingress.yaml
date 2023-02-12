@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docukube-flux-ingress
+spec:
+  rules:
+    - host: flux.docs.lootbot.cloud
+      http:
+        paths:
+          - backend:
+              service:
+                name: docukube-flux-http
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

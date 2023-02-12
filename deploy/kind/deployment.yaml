@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/instance: docukube-kubernetes
-  name: docukube-kubernetes
+    app.kubernetes.io/instance: docukube-kind
+  name: docukube-kind
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app.kubernetes.io/instance: docukube-kubernetes
+      app.kubernetes.io/instance: docukube-kind
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -17,10 +17,10 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: docukube-kubernetes
+        app.kubernetes.io/instance: docukube-kind
     spec:
       containers:
-        - image: ghcr.io/devbot-cloud/docukube-kubernetes:latest
+        - image: ghcr.io/devbot-cloud/docukube-kind:latest
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -29,7 +29,7 @@ spec:
             tcpSocket:
               port: 80
             timeoutSeconds: 1
-          name: docukube-kubernetes
+          name: docukube-kind
           ports:
             - containerPort: 80
               name: http

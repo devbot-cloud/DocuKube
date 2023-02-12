@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docukube-ingress-nginx-ingress
+spec:
+  rules:
+    - host: nginx-ingress.docs.lootbot.cloud
+      http:
+        paths:
+          - backend:
+              service:
+                name: docukube-ingress-nginx-http
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

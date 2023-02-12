@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docukube-cluster-api-ingress
+spec:
+  rules:
+    - host: cluster-api.docs.lootbot.cloud
+      http:
+        paths:
+          - backend:
+              service:
+                name: docukube-cluster-api-http
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
