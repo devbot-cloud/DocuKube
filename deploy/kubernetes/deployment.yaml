@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: docukube-kubernetes
+  name: docukube-kubernetes
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: docukube-kubernetes
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: docukube-kubernetes
+    spec:
+      containers:
+        - image: ghcr.io/devbot-cloud/docukube-kubernetes:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 1
+          name: kubernetes-docs-nginx
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 300Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false

@@ -1,15 +1,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: docukube-rke2-ingress
+  name: docukube-kubernetes-ingress
 spec:
   rules:
-    - host: rke2.docs.lootbot.cloud
+    - host: kubernetes.docs.lootbot.cloud
       http:
         paths:
           - backend:
               service:
-                name: docukube-rke2-http
+                name: docukube-kubernetes-http
                 port:
                   number: 80
             path: /
