@@ -5,8 +5,7 @@ RUN apk add --no-cache git \
     && yarn install --frozen-lockfile \
     && yarn build
 
-FROM nginx:1.21.3-alpine
-COPY --from=builder /rke2-docs/build /usr/share/nginx/html
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+FROM nginx:1.21.3-alpine 
 EXPOSE 80
+COPY --from=builder /rke2-docs/build /usr/share/nginx/html
 LABEL org.opencontainers.image.source = "https://github.com/devbot-cloud/DocuKube"
