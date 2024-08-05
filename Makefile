@@ -5,7 +5,7 @@ BASE_IMAGE_TAG = "base:$(IMAGE_VERSION)"
 IMAGE_USER_ID = "101"
 HELM_CHART_NAME = "docukube"
 HELM_CHART_VERSION = "0.1.0"
-HELM_REPO = $(REPO_NAME)/$(HELM_CHART_NAME)
+HELM_REPO = $(REPO_NAME)
 BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 # Find all directories in the build folder
 BUILD_DIRS := $(shell find build -maxdepth 1 -type d | tail -n +2)
@@ -31,15 +31,12 @@ $(RUN_TARGETS): run-%:
 	@echo "Running image $(REPO_NAME)/$*"
 	@docker run --rm -it -p 8080:8080 $(REPO_NAME)/$*:$(IMAGE_VERSION)
 
-# Build all images
-build: build-base build-images
-
 # push all images
-push: build
+push-images: build
 	@for dir in $(BUILD_DIRS); do \
 		docker push $(REPO_NAME)/$$(basename $$dir):$(IMAGE_VERSION); \
 	done
-
+	
 # Build Helm chart
 helm-build:
 	@echo "Building Helm chart"
@@ -54,6 +51,12 @@ helm-push: helm-build
 	@echo "Pushing Helm chart as OCI"
 	@helm push $(HELM_CHART_NAME)-$(HELM_CHART_VERSION).tgz oci://$(HELM_REPO)
 
+# Build Everything 
+build: build-base build-images
+
+# Push Everything 
+push: push-images helm-push
+
 # Default target
 all: install-dependencies build
 
@@ -61,7 +64,6 @@ all: install-dependencies build
 print_targets:
 	@echo "Build targets: $(BUILD_TARGETS)"
 	@echo "Run targets: $(RUN_TARGETS)"
-
 
 # Install all needed dependencies
 install-dependencies:
@@ -85,3 +87,4 @@ install-dependencies:
 clean:
 	@echo "Cleaning all images related to the repository"
 	@docker images --filter=reference="$(REPO_NAME)/*" -q | xargs -r docker rmi -f
+	@rm -rf $(HELM_CHART_NAME)-$(HELM_CHART_VERSION).tgz
