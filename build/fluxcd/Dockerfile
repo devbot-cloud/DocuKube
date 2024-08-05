@@ -1,6 +1,7 @@
 ARG IMAGE_USER_ID
 ARG BASE_IMAGE
-FROM docker.io/fluxcd/website:hugo-0.110.0-extended as builder
+FROM docker.io/fluxcd/website:hugo-0.122.0-extended as builder
+ENV GITHUB_USER=fluxcd GITHUB_TOKEN=fluxcd
 RUN apk update && \
 	apk add --no-cache \
 	bash \
@@ -21,12 +22,10 @@ RUN apk update && \
 	python3-dev \
 	rsync \
     go \
-    && git clone --recurse-submodules --depth 1 https://github.com/fluxcd/website.git /flux-docs \
+	&& git clone --recurse-submodules --depth 1 https://github.com/fluxcd/website.git /flux-docs \
     && cd /flux-docs \
-    && python3 -m pip install -r requirements.txt \
-    && npm install \
     && make prereqs \
-    && hack/import-calendar.py \
+	&& make gen-content \
     && hugo --cleanDestinationDir --gc --minify --enableGitInfo --environment production --buildDrafts --buildFuture
 
 FROM ${BASE_IMAGE}

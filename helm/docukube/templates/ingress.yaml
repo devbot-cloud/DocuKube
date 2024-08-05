@@ -1,0 +1,25 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "docukube.fullname" $ }}-ingress
+  annotations:
+    {{- range $key, $value := $.Values.ingress.annotations }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          {{- range .Values.sites }}
+          - path: /{{ .name }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "docukube.fullname" $ }}-{{ .name }}
+                port:
+                  number: 80
+          {{- end }}
+{{- end }}
+---

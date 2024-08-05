@@ -1,8 +1,12 @@
 # Global variables
-REPO_NAME = docukube
+REPO_NAME = ghcr.io/devbot-cloud/docukube
 IMAGE_VERSION = "latest"
 BASE_IMAGE_TAG = "base:latest"
 IMAGE_USER_ID = "101"
+HELM_CHART_NAME = "docukube"
+HELM_CHART_VERSION = "0.1.0"
+HELM_REPO = $(REPO_NAME)/$(HELM_CHART_NAME)
+
 
 # Find all directories in the build folder
 BUILD_DIRS := $(shell find build -maxdepth 1 -type d | tail -n +2)
@@ -25,6 +29,10 @@ install-dependencies:
 		echo "Docker is not installed. Please install Docker before proceeding."; \
 		exit 1; \
 	fi
+	# Install helm if it doesn't exist
+	@if ! command -v helm &> /dev/null; then \
+		curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
+	fi
 
 # Build base image
 build-base:
@@ -44,17 +52,6 @@ $(RUN_TARGETS): run-%:
 	@echo "Running image $(REPO_NAME)/$*"
 	@docker run --rm -it -p 8080:8080 $(REPO_NAME)/$*:$(IMAGE_VERSION)
 
-# Test the Kubernetes code using kustomize
-test-kubernetes: install-dependencies
-	@echo "Building and applying Kubernetes code using kustomize"
-	@kustomize build deploy
-
-# # Perform Kubernetes linting
-# TODO - Add kubeval to the Dockerfile
-# lint_kubernetes: install_dependencies
-	@echo "Performing Kubernetes linting"
-	@kubeval deploy/*.yaml
-
 clean:
 	@echo "Cleaning all images related to the repository"
 	@docker images --filter=reference="$(REPO_NAME)/*" -q | xargs -r docker rmi -f
@@ -62,8 +59,28 @@ clean:
 # Build all images
 build: build-base build-images
 
+# push all images
+push: build
+	@for dir in $(BUILD_DIRS); do \
+		docker push $(REPO_NAME)/$$(basename $$dir):$(IMAGE_VERSION); \
+	done
+
+# Build Helm chart
+helm-build:
+	@echo "Building Helm chart"
+	@helm package helm/$(HELM_CHART_NAME) --version $(HELM_CHART_VERSION) --destination .
+
+helm-test:
+	@echo "Testing Helm chart"
+	@helm template $(HELM_CHART_NAME) helm/$(HELM_CHART_NAME) > /dev/null 2>&1
+
+# Push Helm chart as OCI
+helm-push: helm-build
+	@echo "Pushing Helm chart as OCI"
+	@helm push $(HELM_CHART_NAME)-$(HELM_CHART_VERSION).tgz oci://$(HELM_REPO)
+
 # Default target
-all: install-dependencies build test-kubernetes
+all: install-dependencies build
 
 # Print all build and run targets (for debugging)
 print_targets:

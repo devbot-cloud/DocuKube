@@ -3,7 +3,6 @@
 ## Sites Completed
 - rke2
 - minikube
-- kubernetes
 - kind
 - ingress-nginx
 - cluster-api
@@ -15,6 +14,3 @@
 - calico (PAIN) jekyll 
 - vault (PAIN) nextjs
 
-
-
-##

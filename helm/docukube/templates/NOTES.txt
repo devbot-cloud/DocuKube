@@ -1,0 +1,39 @@
+#################################################################
+#                     Deployment Information                    #
+#################################################################
+
+Congratulations! Your application has been successfully deployed.
+
+Below you will find important information about your deployment.
+
+## Example Deployment
+
+- **Name**: example-deployment
+- **Image Version**: `nginx:latest`
+- **FQDN**: [example-deployment.example.com](http://example-deployment.example.com)
+- **Min Ready Seconds**: 10
+
+### Accessing the Example Deployment
+
+You can access the Example Deployment using the following URL:
+  http://example-deployment.example.com
+
+## Additional Deployments
+
+(Include similar details for any additional deployments here)
+
+### Deployment Name: [deployment-name]
+
+- **Name**: [deployment-name]
+- **Image Version**: `[image-version]`
+- **FQDN**: [deployment-name.example.com](http://deployment-name.example.com)
+- **Min Ready Seconds**: `[minReadySeconds]`
+
+#### Accessing the Deployment
+
+You can access the Deployment using the following URL:
+  http://[deployment-name].example.com
+
+#################################################################
+#                    End of Deployment Notes                    #
+#################################################################

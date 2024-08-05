@@ -1,0 +1,21 @@
+{{- range .Values.sites }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "docukube.fullname" $ }}-{{ .name }}
+  labels:
+    {{- include "docukube.labels" $ | nindent 4 }}
+    docukube.devbot.cloud/name: {{ .name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ include "docukube.name" $ }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    docukube.devbot.cloud/name: {{ .name }}
+---
+{{- end }}

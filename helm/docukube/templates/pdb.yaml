@@ -1,0 +1,19 @@
+{{- if .Values.pdb.enabled }}
+{{- range .Values.sites }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "docukube.fullname" $ }}-{{ .name }}
+  labels:
+    {{- include "docukube.labels" $ | nindent 4 }}
+    docukube.devbot.cloud/name: {{ .name }}
+spec:
+  minAvailable: {{ $.Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "docukube.name" $ }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+      docukube.devbot.cloud/name: {{ .name }}
+---
+{{- end }}
+{{- end }}
