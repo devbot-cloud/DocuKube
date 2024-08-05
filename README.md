@@ -9,9 +9,6 @@ With DocuKube, you can access a wealth of information and resources, including t
 So what are you waiting for? Start exploring the world of DocuKube today and take the first step towards hassle-free Kubernetes deployments.
 
 
-
-
-
 ## Site URLs
 http://cluster-api.docs.lootbot.cloud/
 http://flux.docs.lootbot.cloud/

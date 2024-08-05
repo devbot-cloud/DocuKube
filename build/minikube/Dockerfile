@@ -1,3 +1,5 @@
+ARG IMAGE_USER_ID
+ARG BASE_IMAGE
 FROM klakegg/hugo:ext-alpine as builder
 USER root
 RUN apk add --no-cache git make go \
@@ -13,8 +15,5 @@ RUN apk add --no-cache git make go \
     && npm install \
     && hugo --cleanDestinationDir --minify --environment production
 
-FROM nginx:1.21.3-alpine
-EXPOSE 80
-COPY --from=builder /minikube/site/public /usr/share/nginx/html
-LABEL org.opencontainers.image.source = "https://github.com/devbot-cloud/DocuKube"
-LABEL CONTAINER_REPO="ghcr.io/devbot-cloud/docukube-minikube"
+FROM ${BASE_IMAGE}
+COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /minikube/site/public /usr/share/nginx/html

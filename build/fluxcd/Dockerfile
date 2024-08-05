@@ -1,3 +1,5 @@
+ARG IMAGE_USER_ID
+ARG BASE_IMAGE
 FROM docker.io/fluxcd/website:hugo-0.110.0-extended as builder
 RUN apk update && \
 	apk add --no-cache \
@@ -27,8 +29,5 @@ RUN apk update && \
     && hack/import-calendar.py \
     && hugo --cleanDestinationDir --gc --minify --enableGitInfo --environment production --buildDrafts --buildFuture
 
-FROM nginx:1.21.3-alpine 
-EXPOSE 80
-COPY --from=builder /flux-docs/public /usr/share/nginx/html
-LABEL org.opencontainers.image.source "https://github.com/devbot-cloud/DocuKube"
-LABEL CONTAINER_REPO="ghcr.io/devbot-cloud/docukube-flux"
+FROM ${BASE_IMAGE}
+COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /flux-docs/public /usr/share/nginx/html
