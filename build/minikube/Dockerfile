@@ -20,4 +20,5 @@ RUN git clone --recurse-submodules --depth 1 https://github.com/kubernetes/minik
 RUN cd /minikube/site && hugo --cleanDestinationDir --minify --environment production
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /minikube/site/public /usr/share/nginx/html

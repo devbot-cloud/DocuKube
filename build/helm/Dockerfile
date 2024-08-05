@@ -11,4 +11,5 @@ RUN apk add --no-cache git \
     && hugo --cleanDestinationDir --environment production
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /helm-docs/app /usr/share/nginx/html

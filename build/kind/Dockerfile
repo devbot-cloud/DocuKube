@@ -10,4 +10,5 @@ RUN apk add --no-cache git \
     && hugo --cleanDestinationDir --minify --environment production
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /kind/site/public /usr/share/nginx/html

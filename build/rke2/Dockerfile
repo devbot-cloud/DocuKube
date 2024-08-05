@@ -7,4 +7,5 @@ RUN apk add --no-cache git \
     && git checkout gh-pages
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /rke2-docs/ /usr/share/nginx/html

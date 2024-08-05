@@ -1,10 +1,10 @@
 # Global variables
 REPO_NAME = ghcr.io/devbot-cloud/docukube
-IMAGE_VERSION = "0.1.0"
+IMAGE_VERSION = "0.1.4"
 BASE_IMAGE_TAG = "base:$(IMAGE_VERSION)"
 IMAGE_USER_ID = "101"
 HELM_CHART_NAME = "docukube"
-HELM_CHART_VERSION = "0.1.0"
+HELM_CHART_VERSION = "$(IMAGE_VERSION)"
 HELM_REPO = $(REPO_NAME)
 BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 # Find all directories in the build folder
@@ -16,7 +16,7 @@ RUN_TARGETS := $(addprefix run-, $(notdir $(BUILD_DIRS)))
 # Build base image
 build-base:
 	@echo "Building base image"
-	@docker build --build-arg IMAGE_USER_ID=$(IMAGE_USER_ID) --build-arg IMAGE_VERSION=$(IMAGE_VERSION) --build-arg BUILD_DATE=$(BUILD_DATE) -t $(REPO_NAME)/$(BASE_IMAGE_TAG) base
+	@docker build --no-cache --build-arg IMAGE_USER_ID=$(IMAGE_USER_ID) --build-arg IMAGE_VERSION=$(IMAGE_VERSION) --build-arg BUILD_DATE=$(BUILD_DATE) -t $(REPO_NAME)/$(BASE_IMAGE_TAG) base
 
 # Pattern rule to build individual images
 $(BUILD_TARGETS): build-%: build-base

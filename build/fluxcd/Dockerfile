@@ -1,4 +1,3 @@
-ARG IMAGE_USER_ID
 ARG BASE_IMAGE
 FROM docker.io/fluxcd/website:hugo-0.122.0-extended as builder
 ENV GITHUB_USER=fluxcd GITHUB_TOKEN=fluxcd
@@ -29,4 +28,5 @@ RUN apk update && \
     && hugo --cleanDestinationDir --gc --minify --enableGitInfo --environment production --buildDrafts --buildFuture
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder --chown=${IMAGE_USER_ID}:nginx /flux-docs/public /usr/share/nginx/html

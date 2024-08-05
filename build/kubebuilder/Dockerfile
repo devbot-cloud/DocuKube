@@ -7,4 +7,5 @@ RUN git clone --recurse-submodules --depth 1 https://github.com/kubernetes-sigs/
     && ./install-and-build.sh
 
 FROM ${BASE_IMAGE}
+ARG IMAGE_USER_ID
 COPY --from=builder /kubebuilder/docs/book/book /usr/share/nginx/html
