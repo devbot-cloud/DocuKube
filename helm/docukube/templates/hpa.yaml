@@ -1,6 +1,6 @@
 {{- if .Values.hpa.enabled }}
 {{- range .Values.sites }}
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "docukube.fullname" $ }}-{{ .name }}
