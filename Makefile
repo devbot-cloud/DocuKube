@@ -1,48 +1,27 @@
 # Global variables
 REPO_NAME = ghcr.io/devbot-cloud/docukube
-IMAGE_VERSION = "latest"
-BASE_IMAGE_TAG = "base:latest"
+IMAGE_VERSION = "0.1.0"
+BASE_IMAGE_TAG = "base:$(IMAGE_VERSION)"
 IMAGE_USER_ID = "101"
 HELM_CHART_NAME = "docukube"
 HELM_CHART_VERSION = "0.1.0"
 HELM_REPO = $(REPO_NAME)/$(HELM_CHART_NAME)
-
-
+BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 # Find all directories in the build folder
 BUILD_DIRS := $(shell find build -maxdepth 1 -type d | tail -n +2)
-
 # Convert directories to build and run targets with appropriate prefixes
 BUILD_TARGETS := $(addprefix build-, $(notdir $(BUILD_DIRS)))
 RUN_TARGETS := $(addprefix run-, $(notdir $(BUILD_DIRS)))
 
-# Install all needed dependencies
-install-dependencies:
-	@echo "Installing dependencies"
-	# Install kubectl if it doesn't exist
-	@if ! command -v kubectl &> /dev/null; then \
-		curl -LO "https://dl.k8s.io/release/$(shell curl --silent --location https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; \
-		chmod +x kubectl; \
-		sudo mv kubectl /usr/local/bin/; \
-	fi
-	# Check if docker is installed
-	@if ! command -v docker &> /dev/null; then \
-		echo "Docker is not installed. Please install Docker before proceeding."; \
-		exit 1; \
-	fi
-	# Install helm if it doesn't exist
-	@if ! command -v helm &> /dev/null; then \
-		curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
-	fi
-
 # Build base image
 build-base:
 	@echo "Building base image"
-	@docker build --build-arg IMAGE_USER_ID=$(IMAGE_USER_ID) -t $(REPO_NAME)/$(BASE_IMAGE_TAG) base
+	@docker build --build-arg IMAGE_USER_ID=$(IMAGE_USER_ID) --build-arg IMAGE_VERSION=$(IMAGE_VERSION) --build-arg BUILD_DATE=$(BUILD_DATE) -t $(REPO_NAME)/$(BASE_IMAGE_TAG) base
 
 # Pattern rule to build individual images
 $(BUILD_TARGETS): build-%: build-base
 	@echo "Building image in build/$*"
-	@docker build --build-arg BASE_IMAGE=$(REPO_NAME)/$(BASE_IMAGE_TAG) -t $(REPO_NAME)/$*:$(IMAGE_VERSION) build/$*
+	@docker build --build-arg BASE_IMAGE=$(REPO_NAME)/$(BASE_IMAGE_TAG) --build-arg IMAGE_VERSION=$(IMAGE_VERSION) --build-arg BUILD_DATE=$(BUILD_DATE) -t $(REPO_NAME)/$*:$(IMAGE_VERSION) build/$*
 
 # Build all images in the build folder
 build-images: $(BUILD_TARGETS)
@@ -51,10 +30,6 @@ build-images: $(BUILD_TARGETS)
 $(RUN_TARGETS): run-%:
 	@echo "Running image $(REPO_NAME)/$*"
 	@docker run --rm -it -p 8080:8080 $(REPO_NAME)/$*:$(IMAGE_VERSION)
-
-clean:
-	@echo "Cleaning all images related to the repository"
-	@docker images --filter=reference="$(REPO_NAME)/*" -q | xargs -r docker rmi -f
 
 # Build all images
 build: build-base build-images
@@ -86,3 +61,27 @@ all: install-dependencies build
 print_targets:
 	@echo "Build targets: $(BUILD_TARGETS)"
 	@echo "Run targets: $(RUN_TARGETS)"
+
+
+# Install all needed dependencies
+install-dependencies:
+	@echo "Installing dependencies"
+	# Install kubectl if it doesn't exist
+	@if ! command -v kubectl &> /dev/null; then \
+		curl -LO "https://dl.k8s.io/release/$(shell curl --silent --location https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; \
+		chmod +x kubectl; \
+		sudo mv kubectl /usr/local/bin/; \
+	fi
+	# Check if docker is installed
+	@if ! command -v docker &> /dev/null; then \
+		echo "Docker is not installed. Please install Docker before proceeding."; \
+		exit 1; \
+	fi
+	# Install helm if it doesn't exist
+	@if ! command -v helm &> /dev/null; then \
+		curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
+	fi
+
+clean:
+	@echo "Cleaning all images related to the repository"
+	@docker images --filter=reference="$(REPO_NAME)/*" -q | xargs -r docker rmi -f
